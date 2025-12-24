@@ -44,10 +44,12 @@ Nach dem Start können Sie die API direkt im Browser testen:
 6. Die Response wird direkt im Browser angezeigt
 
 **Authentifizierung in Swagger:**
+
 - Falls `API_TOKEN` gesetzt ist, klicken Sie auf "Authorize" (oben rechts)
 - Geben Sie Ihren Token ein (ohne "Bearer")
 - Klicken Sie auf "Authorize" und schließen Sie das Fenster
-```
+
+````
 
 ### Mit Docker
 
@@ -60,19 +62,19 @@ docker run -d -p 3000:3000 --name imagemagick-api imagemagick-api
 
 # Mit Authentifizierung
 docker run -d -p 3000:3000 -e API_TOKEN="your-secret-token" imagemagick-api
-```
+````
 
 ## Konfiguration
 
 ### Umgebungsvariablen
 
-| Variable | Beschreibung | Default |
-|----------|--------------|---------|
-| `API_TOKEN` | Optional: API-Token für Authentifizierung | (leer, keine Auth) |
-| `PORT` | Server-Port | 3000 |
-| `NODE_ENV` | Umgebung (production/development) | production |
-| `MAX_FILE_SIZE` | Maximale Upload-Größe in Bytes | 52428800 (50 MB) |
-| `CLEANUP_DELAY` | Verzögerung beim Löschen temporärer Dateien (ms) | 0 |
+| Variable        | Beschreibung                                     | Default            |
+| --------------- | ------------------------------------------------ | ------------------ |
+| `API_TOKEN`     | Optional: API-Token für Authentifizierung        | (leer, keine Auth) |
+| `PORT`          | Server-Port                                      | 3000               |
+| `NODE_ENV`      | Umgebung (production/development)                | production         |
+| `MAX_FILE_SIZE` | Maximale Upload-Größe in Bytes                   | 52428800 (50 MB)   |
+| `CLEANUP_DELAY` | Verzögerung beim Löschen temporärer Dateien (ms) | 0                  |
 
 ### Authentifizierung aktivieren
 
@@ -118,9 +120,11 @@ curl http://localhost:3000/health
 Terminal-Dithering-Effekt anwenden (Floyd-Steinberg Dithering)
 
 **Parameter:**
+
 - `image` (file, required) - Bilddatei
 
 **Beispiel:**
+
 ```bash
 curl -X POST http://localhost:3000/terminal \
   -F "image=@innenstadt.png" \
@@ -128,6 +132,7 @@ curl -X POST http://localhost:3000/terminal \
 ```
 
 **Response:**
+
 ```json
 {
   "success": 1,
@@ -142,17 +147,20 @@ curl -X POST http://localhost:3000/terminal \
 Bildgröße ändern mit optionaler Seitenverhältnis-Berechnung
 
 **Parameter:**
+
 - `image` (file, required) - Bilddatei
 - `width` (number, optional) - Zielbreite in Pixel
 - `height` (number, optional) - Zielhöhe in Pixel
 - `format` (string, required) - Ausgabeformat (png, jpg, webp, etc.)
 
 **Verhalten:**
+
 - Beide angegeben: Exakte Größe (kann verzerren)
 - Nur width: Höhe wird automatisch berechnet
 - Nur height: Breite wird automatisch berechnet
 
 **Beispiel:**
+
 ```bash
 curl -X POST http://localhost:3000/resize \
   -F "image=@photo.jpg" \
@@ -162,6 +170,7 @@ curl -X POST http://localhost:3000/resize \
 ```
 
 **Response:**
+
 ```json
 {
   "success": 1,
@@ -177,11 +186,13 @@ curl -X POST http://localhost:3000/resize \
 Bildformat konvertieren
 
 **Parameter:**
+
 - `image` (file, required) - Bilddatei
 - `format` (string, required) - Zielformat (png, jpg, webp, gif, bmp, tiff, svg)
 - `quality` (number, optional) - Qualität für JPG/WebP (1-100)
 
 **Beispiel:**
+
 ```bash
 curl -X POST http://localhost:3000/convert \
   -F "image=@image.png" \
@@ -191,6 +202,7 @@ curl -X POST http://localhost:3000/convert \
 ```
 
 **Response:**
+
 ```json
 {
   "success": 1,
@@ -205,6 +217,7 @@ curl -X POST http://localhost:3000/convert \
 Bild drehen oder spiegeln
 
 **Parameter:**
+
 - `image` (file, required) - Bilddatei
 - `operation` (string, required) - "rotate" oder "flip"
 - `value` (string/number, required) -
@@ -213,6 +226,7 @@ Bild drehen oder spiegeln
 - `format` (string, required) - Ausgabeformat
 
 **Beispiel Rotation:**
+
 ```bash
 curl -X POST http://localhost:3000/rotate \
   -F "image=@photo.jpg" \
@@ -223,6 +237,7 @@ curl -X POST http://localhost:3000/rotate \
 ```
 
 **Beispiel Flip:**
+
 ```bash
 curl -X POST http://localhost:3000/rotate \
   -F "image=@photo.jpg" \
@@ -233,6 +248,7 @@ curl -X POST http://localhost:3000/rotate \
 ```
 
 **Response:**
+
 ```json
 {
   "success": 1,
@@ -248,17 +264,20 @@ curl -X POST http://localhost:3000/rotate \
 Bild zuschneiden
 
 **Parameter:**
+
 - `image` (file, required) - Bilddatei
 - `mode` (string, required) - "manual" oder "trim"
 - `format` (string, required) - Ausgabeformat
 
 **Für mode="manual":**
+
 - `width` (number, required) - Breite des Zuschnitts
 - `height` (number, required) - Höhe des Zuschnitts
 - `x` (number, required) - X-Offset
 - `y` (number, required) - Y-Offset
 
 **Beispiel Manual Crop:**
+
 ```bash
 curl -X POST http://localhost:3000/crop \
   -F "image=@photo.jpg" \
@@ -272,6 +291,7 @@ curl -X POST http://localhost:3000/crop \
 ```
 
 **Beispiel Auto-Trim:**
+
 ```bash
 curl -X POST http://localhost:3000/crop \
   -F "image=@photo.jpg" \
@@ -281,6 +301,7 @@ curl -X POST http://localhost:3000/crop \
 ```
 
 **Response:**
+
 ```json
 {
   "success": 1,
@@ -299,11 +320,13 @@ curl -X POST http://localhost:3000/crop \
 Bildqualität und Dateigröße optimieren
 
 **Parameter:**
+
 - `image` (file, required) - Bilddatei
 - `quality` (number, required) - Qualität 1-100 (niedriger = kleinere Datei)
 - `format` (string, required) - Ausgabeformat
 
 **Beispiel:**
+
 ```bash
 curl -X POST http://localhost:3000/optimize \
   -F "image=@photo.jpg" \
@@ -313,6 +336,7 @@ curl -X POST http://localhost:3000/optimize \
 ```
 
 **Response:**
+
 ```json
 {
   "success": 1,
@@ -327,6 +351,7 @@ curl -X POST http://localhost:3000/optimize \
 Alle Endpunkte liefern JSON-Responses:
 
 ### Erfolg
+
 ```json
 {
   "success": 1,
@@ -337,6 +362,7 @@ Alle Endpunkte liefern JSON-Responses:
 ```
 
 ### Fehler
+
 ```json
 {
   "success": 0,
@@ -349,15 +375,17 @@ Alle Endpunkte liefern JSON-Responses:
 Das `image` Feld enthält Base64-kodierte Bilddaten. So konvertieren Sie diese:
 
 ### JavaScript/Node.js
-```javascript
-const fs = require('fs');
-const response = require('./response.json');
 
-const buffer = Buffer.from(response.image, 'base64');
-fs.writeFileSync('output.png', buffer);
+```javascript
+const fs = require("fs");
+const response = require("./response.json");
+
+const buffer = Buffer.from(response.image, "base64");
+fs.writeFileSync("output.png", buffer);
 ```
 
 ### Python
+
 ```python
 import json
 import base64
@@ -371,6 +399,7 @@ with open('output.png', 'wb') as f:
 ```
 
 ### Bash
+
 ```bash
 cat response.json | jq -r '.image' | base64 -d > output.png
 ```
@@ -478,6 +507,7 @@ docker-compose logs
 ### ImageMagick Befehle funktionieren nicht
 
 Prüfen Sie ob alle Dependencies installiert sind:
+
 ```bash
 docker exec -it imagemagick-api sh
 magick --version
@@ -486,10 +516,6 @@ magick --version
 ### Temporäre Dateien werden nicht gelöscht
 
 Prüfen Sie `CLEANUP_DELAY` in der Konfiguration.
-
-## Lizenz
-
-MIT
 
 ## Support
 
