@@ -1,18 +1,16 @@
-# Use Debian Bookworm with Node.js LTS
-FROM node:lts-bookworm
+# Use Alpine Linux with Node.js LTS
+FROM node:lts-alpine
 
 # Install ImageMagick and required dependencies
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     imagemagick \
-    librsvg2-bin \
+    librsvg \
     inkscape \
     fontconfig \
-    libfreetype6 \
-    libpng16-16 \
-    libjpeg62-turbo \
-    dnsutils \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    freetype \
+    libpng \
+    libjpeg-turbo \
+    bind-tools
 
 # Create app directory
 WORKDIR /app

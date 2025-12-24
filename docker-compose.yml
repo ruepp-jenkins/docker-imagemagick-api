@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   imagemagick-api:
-    build: .
+    image: ruepp/imagemagick-api
     container_name: imagemagick-api
     ports:
       - "3000:3000"
