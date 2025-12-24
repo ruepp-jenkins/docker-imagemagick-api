@@ -26,7 +26,7 @@ pipeline {
             cronTabSpec: 'H/30 * * * *',
             entries: [
                 URLTriggerEntry(
-                    url: 'https://hub.docker.com/v2/namespaces/library/repositories/node/tags/lts-bookworm',
+                    url: 'https://hub.docker.com/v2/namespaces/library/repositories/node/tags/lts-alpine',
                     contentTypes: [
                         JsonContent(
                             [
