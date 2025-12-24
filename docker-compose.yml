@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  imagemagick-api:
+    build: .
+    container_name: imagemagick-api
+    ports:
+      - "3000:3000"
+    environment:
+      # Optional: Set API_TOKEN to enable authentication
+      # If set, all requests must include this token in the Authorization header
+      # Example: Authorization: Bearer your-secret-token
+      # Leave empty or remove to disable authentication
+      - API_TOKEN=
+
+      # Server configuration
+      - NODE_ENV=production
+      - PORT=3000
+      - MAX_FILE_SIZE=52428800  # 50 MB in bytes
+
+      # Temp file cleanup (in milliseconds, default: immediate cleanup)
+      - CLEANUP_DELAY=0
+    volumes:
+      # Optional: Mount a volume for persistent temp files if needed
+      # - ./tmpfiles:/app/tmpfiles
+    restart: unless-stopped
+
+    # Resource limits (adjust based on your needs)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M

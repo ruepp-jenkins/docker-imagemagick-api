@@ -1,0 +1,449 @@
+openapi: 3.0.0
+info:
+  title: ImageMagick API
+  description: RESTful API wrapper for ImageMagick functionality with browser-based testing
+  version: 1.0.0
+  contact:
+    name: API Support
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+  - url: http://your-production-url:3000
+    description: Production server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Optional API token authentication (only if API_TOKEN is set)
+
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: integer
+          enum: [1]
+          description: Success indicator
+        image:
+          type: string
+          format: byte
+          description: Base64 encoded image data
+        format:
+          type: string
+          description: Output image format
+      required:
+        - success
+        - image
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: integer
+          enum: [0]
+          description: Error indicator
+        errormessage:
+          type: string
+          description: Error description
+      required:
+        - success
+        - errormessage
+
+    HealthResponse:
+      type: object
+      properties:
+        success:
+          type: integer
+          enum: [1]
+        status:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        uptime:
+          type: number
+
+security:
+  - BearerAuth: []
+  - {}
+
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check endpoint
+      description: Check if the API is running and healthy
+      security: []
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /:
+    get:
+      tags:
+        - System
+      summary: API information
+      description: Get information about available endpoints
+      responses:
+        '200':
+          description: API information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /terminal:
+    post:
+      tags:
+        - Image Processing
+      summary: Apply terminal dithering effect
+      description: Apply Floyd-Steinberg dithering for terminal display (creates a 1-bit black/white effect)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to process
+              required:
+                - image
+      responses:
+        '200':
+          description: Image processed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      effect:
+                        type: string
+                        example: terminal-dithering
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /resize:
+    post:
+      tags:
+        - Image Processing
+      summary: Resize image
+      description: |
+        Resize image with optional aspect ratio preservation:
+        - Both width and height: Exact dimensions (may distort)
+        - Only width: Height calculated automatically
+        - Only height: Width calculated automatically
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to resize
+                width:
+                  type: integer
+                  minimum: 1
+                  description: Target width in pixels (optional if height provided)
+                  example: 800
+                height:
+                  type: integer
+                  minimum: 1
+                  description: Target height in pixels (optional if width provided)
+                  example: 600
+                format:
+                  type: string
+                  enum: [png, jpg, jpeg, webp, gif, bmp, tiff]
+                  description: Output image format
+                  example: png
+              required:
+                - image
+                - format
+      responses:
+        '200':
+          description: Image resized successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      width:
+                        type: string
+                      height:
+                        type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /convert:
+    post:
+      tags:
+        - Image Processing
+      summary: Convert image format
+      description: Convert image between different formats with optional quality control
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to convert
+                format:
+                  type: string
+                  enum: [png, jpg, jpeg, webp, gif, bmp, tiff, svg]
+                  description: Target output format
+                  example: jpg
+                quality:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+                  description: Quality for lossy formats like JPG/WebP (1-100)
+                  example: 85
+              required:
+                - image
+                - format
+      responses:
+        '200':
+          description: Image converted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      quality:
+                        type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /rotate:
+    post:
+      tags:
+        - Image Processing
+      summary: Rotate or flip image
+      description: |
+        Rotate image by degrees or flip horizontally/vertically:
+        - Rotate: 90, 180, 270 degrees
+        - Flip: horizontal or vertical
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to transform
+                operation:
+                  type: string
+                  enum: [rotate, flip]
+                  description: Type of operation
+                  example: rotate
+                value:
+                  type: string
+                  description: For rotate (90, 180, 270), for flip (horizontal, vertical)
+                  example: "90"
+                format:
+                  type: string
+                  enum: [png, jpg, jpeg, webp, gif, bmp, tiff]
+                  description: Output image format
+                  example: png
+              required:
+                - image
+                - operation
+                - value
+                - format
+      responses:
+        '200':
+          description: Image transformed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      operation:
+                        type: string
+                      value:
+                        type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /crop:
+    post:
+      tags:
+        - Image Processing
+      summary: Crop image
+      description: |
+        Crop image manually or auto-trim borders:
+        - Manual mode: Specify exact crop dimensions and position
+        - Trim mode: Automatically remove transparent/white borders
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to crop
+                mode:
+                  type: string
+                  enum: [manual, trim]
+                  description: Crop mode
+                  example: manual
+                format:
+                  type: string
+                  enum: [png, jpg, jpeg, webp, gif, bmp, tiff]
+                  description: Output image format
+                  example: png
+                width:
+                  type: integer
+                  minimum: 1
+                  description: Crop width in pixels (required for manual mode)
+                  example: 500
+                height:
+                  type: integer
+                  minimum: 1
+                  description: Crop height in pixels (required for manual mode)
+                  example: 500
+                x:
+                  type: integer
+                  minimum: 0
+                  description: X offset in pixels (required for manual mode)
+                  example: 0
+                y:
+                  type: integer
+                  minimum: 0
+                  description: Y offset in pixels (required for manual mode)
+                  example: 0
+              required:
+                - image
+                - mode
+                - format
+      responses:
+        '200':
+          description: Image cropped successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      mode:
+                        type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /optimize:
+    post:
+      tags:
+        - Image Processing
+      summary: Optimize image quality and file size
+      description: Reduce image file size by adjusting quality and stripping metadata
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to optimize
+                quality:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+                  description: Quality percentage (lower = smaller file size)
+                  example: 70
+                format:
+                  type: string
+                  enum: [png, jpg, jpeg, webp, gif, bmp, tiff]
+                  description: Output image format
+                  example: jpg
+              required:
+                - image
+                - quality
+                - format
+      responses:
+        '200':
+          description: Image optimized successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      quality:
+                        type: integer
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+tags:
+  - name: System
+    description: System and health endpoints
+  - name: Image Processing
+    description: Image manipulation endpoints
