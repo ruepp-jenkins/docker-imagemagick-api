@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs').promises;
 const { validateFile, validateParams, validateNumeric, successResponse, binaryResponse } = require('../utils/response');
-const { saveTempFile, readFileAsBase64, cleanupFiles, getExtension } = require('../utils/fileHandler');
+const { saveTempFile, readFileAsBase64, cleanupFiles, getExtension, getMimeType } = require('../utils/fileHandler');
 const { cropImage, trimImage } = require('../utils/imagemagick');
 
 const router = express.Router();
@@ -111,7 +111,10 @@ router.post('/', upload.single('image'), async (req, res, next) => {
       binaryResponse(res, imageBuffer, metadata, outputExt, `cropped.${outputExt}`);
     } else {
       const base64Image = imageBuffer.toString('base64');
-      res.json(successResponse(base64Image, metadata));
+      res.json(successResponse(base64Image, {
+        mimetype: getMimeType(outputExt),
+        ...metadata
+      }));
     }
 
     // Cleanup temp files

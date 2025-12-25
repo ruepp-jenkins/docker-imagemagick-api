@@ -123,6 +123,7 @@ curl -X POST http://localhost:3000/resize \
 {
   "success": 1,
   "image": "iVBORw0KGgoAAAANSUhEUgAA...",
+  "mimetype": "image/png",
   "format": "png",
   "width": 800,
   "height": 600
@@ -151,6 +152,7 @@ curl -X POST "http://localhost:3000/resize?responseMode=binary" \
   - `Content-Type`: image/png (or image/jpeg, etc.)
   - `Content-Disposition`: attachment; filename="resized.png"
   - `X-Image-Success`: 1
+  - `X-Image-Mimetype`: image/png (matches Content-Type)
   - `X-Image-Format`: png
   - `X-Image-Width`: 800 (or "auto")
   - `X-Image-Height`: 600 (or "auto")
@@ -172,6 +174,7 @@ const response = await fetch('http://localhost:3000/resize?responseMode=binary',
 // Get metadata from headers
 const metadata = {
   success: response.headers.get('X-Image-Success'),
+  mimetype: response.headers.get('X-Image-Mimetype'),
   format: response.headers.get('X-Image-Format'),
   width: response.headers.get('X-Image-Width'),
   height: response.headers.get('X-Image-Height')

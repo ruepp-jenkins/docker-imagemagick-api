@@ -47,6 +47,9 @@ components:
           type: string
           format: byte
           description: Base64 encoded image data
+        mimetype:
+          type: string
+          description: MIME type of the output image (e.g., image/png, image/jpeg)
         format:
           type: string
           description: Output image format
@@ -166,6 +169,7 @@ paths:
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
                 - X-Image-Success: 1
+                - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: png
                 - X-Image-Effect: terminal-dithering
         '400':
@@ -252,6 +256,7 @@ paths:
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
                 - X-Image-Success: 1
+                - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: png
                 - X-Image-Width: 800 (or "auto")
                 - X-Image-Height: 600 (or "auto")
@@ -323,6 +328,7 @@ paths:
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
                 - X-Image-Success: 1
+                - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: jpg
                 - X-Image-Quality: 85 (or "default")
         '400':
@@ -403,6 +409,7 @@ paths:
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
                 - X-Image-Success: 1
+                - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: png
                 - X-Image-Operation: rotate
                 - X-Image-Value: 90
@@ -497,6 +504,7 @@ paths:
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
                 - X-Image-Success: 1
+                - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: png
                 - X-Image-Mode: manual (or trim)
                 - Additional headers for manual mode: X-Image-Width, X-Image-Height, X-Image-X, X-Image-Y
@@ -569,6 +577,7 @@ paths:
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
                 - X-Image-Success: 1
+                - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: jpg
                 - X-Image-Quality: 70
         '400':

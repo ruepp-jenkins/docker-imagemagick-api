@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs').promises;
 const { validateFile, validateParams, successResponse, binaryResponse } = require('../utils/response');
-const { saveTempFile, readFileAsBase64, cleanupFiles, getExtension } = require('../utils/fileHandler');
+const { saveTempFile, readFileAsBase64, cleanupFiles, getExtension, getMimeType } = require('../utils/fileHandler');
 const { rotateImage, flipImage } = require('../utils/imagemagick');
 
 const router = express.Router();
@@ -95,6 +95,7 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     } else {
       const base64Image = imageBuffer.toString('base64');
       res.json(successResponse(base64Image, {
+        mimetype: getMimeType(outputExt),
         format: outputExt,
         operation: op,
         value: value
