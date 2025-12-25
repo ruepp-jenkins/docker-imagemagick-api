@@ -122,6 +122,15 @@ paths:
         - Image Processing
       summary: Apply terminal dithering effect
       description: Apply Floyd-Steinberg dithering for terminal display (creates a 1-bit black/white effect)
+      parameters:
+        - name: responseMode
+          in: query
+          description: Response format mode
+          required: false
+          schema:
+            type: string
+            enum: [base64, binary]
+            default: base64
       requestBody:
         required: true
         content:
@@ -148,6 +157,17 @@ paths:
                       effect:
                         type: string
                         example: terminal-dithering
+              description: Returned when responseMode=base64 (default)
+            image/*:
+              schema:
+                type: string
+                format: binary
+              description: |
+                Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
+                - Content-Type: image/* (image/png, image/jpeg, etc.)
+                - X-Image-Success: 1
+                - X-Image-Format: png
+                - X-Image-Effect: terminal-dithering
         '400':
           description: Bad request
           content:
@@ -171,6 +191,15 @@ paths:
         - Both width and height: Exact dimensions (may distort)
         - Only width: Height calculated automatically
         - Only height: Width calculated automatically
+      parameters:
+        - name: responseMode
+          in: query
+          description: Response format mode
+          required: false
+          schema:
+            type: string
+            enum: [base64, binary]
+            default: base64
       requestBody:
         required: true
         content:
@@ -214,6 +243,18 @@ paths:
                         type: string
                       height:
                         type: string
+              description: Returned when responseMode=base64 (default)
+            image/*:
+              schema:
+                type: string
+                format: binary
+              description: |
+                Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
+                - Content-Type: image/* (image/png, image/jpeg, etc.)
+                - X-Image-Success: 1
+                - X-Image-Format: png
+                - X-Image-Width: 800 (or "auto")
+                - X-Image-Height: 600 (or "auto")
         '400':
           description: Bad request
           content:
@@ -227,6 +268,15 @@ paths:
         - Image Processing
       summary: Convert image format
       description: Convert image between different formats with optional quality control
+      parameters:
+        - name: responseMode
+          in: query
+          description: Response format mode
+          required: false
+          schema:
+            type: string
+            enum: [base64, binary]
+            default: base64
       requestBody:
         required: true
         content:
@@ -264,6 +314,17 @@ paths:
                     properties:
                       quality:
                         type: string
+              description: Returned when responseMode=base64 (default)
+            image/*:
+              schema:
+                type: string
+                format: binary
+              description: |
+                Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
+                - Content-Type: image/* (image/png, image/jpeg, etc.)
+                - X-Image-Success: 1
+                - X-Image-Format: jpg
+                - X-Image-Quality: 85 (or "default")
         '400':
           description: Bad request
           content:
@@ -280,6 +341,15 @@ paths:
         Rotate image by degrees or flip horizontally/vertically:
         - Rotate: 90, 180, 270 degrees
         - Flip: horizontal or vertical
+      parameters:
+        - name: responseMode
+          in: query
+          description: Response format mode
+          required: false
+          schema:
+            type: string
+            enum: [base64, binary]
+            default: base64
       requestBody:
         required: true
         content:
@@ -324,6 +394,18 @@ paths:
                         type: string
                       value:
                         type: string
+              description: Returned when responseMode=base64 (default)
+            image/*:
+              schema:
+                type: string
+                format: binary
+              description: |
+                Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
+                - Content-Type: image/* (image/png, image/jpeg, etc.)
+                - X-Image-Success: 1
+                - X-Image-Format: png
+                - X-Image-Operation: rotate
+                - X-Image-Value: 90
         '400':
           description: Bad request
           content:
@@ -340,6 +422,15 @@ paths:
         Crop image manually or auto-trim borders:
         - Manual mode: Specify exact crop dimensions and position
         - Trim mode: Automatically remove transparent/white borders
+      parameters:
+        - name: responseMode
+          in: query
+          description: Response format mode
+          required: false
+          schema:
+            type: string
+            enum: [base64, binary]
+            default: base64
       requestBody:
         required: true
         content:
@@ -397,6 +488,18 @@ paths:
                     properties:
                       mode:
                         type: string
+              description: Returned when responseMode=base64 (default)
+            image/*:
+              schema:
+                type: string
+                format: binary
+              description: |
+                Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
+                - Content-Type: image/* (image/png, image/jpeg, etc.)
+                - X-Image-Success: 1
+                - X-Image-Format: png
+                - X-Image-Mode: manual (or trim)
+                - Additional headers for manual mode: X-Image-Width, X-Image-Height, X-Image-X, X-Image-Y
         '400':
           description: Bad request
           content:
@@ -410,6 +513,15 @@ paths:
         - Image Processing
       summary: Optimize image quality and file size
       description: Reduce image file size by adjusting quality and stripping metadata
+      parameters:
+        - name: responseMode
+          in: query
+          description: Response format mode
+          required: false
+          schema:
+            type: string
+            enum: [base64, binary]
+            default: base64
       requestBody:
         required: true
         content:
@@ -448,6 +560,17 @@ paths:
                     properties:
                       quality:
                         type: integer
+              description: Returned when responseMode=base64 (default)
+            image/*:
+              schema:
+                type: string
+                format: binary
+              description: |
+                Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
+                - Content-Type: image/* (image/png, image/jpeg, etc.)
+                - X-Image-Success: 1
+                - X-Image-Format: jpg
+                - X-Image-Quality: 70
         '400':
           description: Bad request
           content:

@@ -114,6 +114,25 @@ const getExtension = (mimeTypeOrFilename) => {
   return mimeMap[mimeTypeOrFilename] || 'png';
 };
 
+/**
+ * Get MIME type from file extension
+ * @param {string} extension - File extension (e.g., 'png', 'jpg')
+ * @returns {string} MIME type
+ */
+const getMimeType = (extension) => {
+  const mimeMap = {
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'gif': 'image/gif',
+    'webp': 'image/webp',
+    'bmp': 'image/bmp',
+    'tiff': 'image/tiff',
+    'svg': 'image/svg+xml'
+  };
+  return mimeMap[extension.toLowerCase()] || 'application/octet-stream';
+};
+
 module.exports = {
   ensureTempDir,
   generateTempPath,
@@ -121,5 +140,6 @@ module.exports = {
   readFileAsBase64,
   deleteFile,
   cleanupFiles,
-  getExtension
+  getExtension,
+  getMimeType
 };

@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
-const { validateFile, validateParams, validateNumeric } = require('../utils/response');
-const { successResponse } = require('../utils/response');
+const fs = require('fs').promises;
+const { validateFile, validateParams, validateNumeric, successResponse, binaryResponse } = require('../utils/response');
 const { saveTempFile, readFileAsBase64, cleanupFiles, getExtension } = require('../utils/fileHandler');
 const { cropImage, trimImage } = require('../utils/imagemagick');
 
@@ -83,14 +83,19 @@ router.post('/', upload.single('image'), async (req, res, next) => {
       await trimImage(inputPath, outputPath, format);
     }
 
-    // Read output as base64
-    const base64Image = await readFileAsBase64(outputPath);
+    // Get response mode
+    const responseMode = req.query.responseMode || 'base64';
 
-    // Cleanup temp files
-    await cleanupFiles([inputPath, outputPath]);
+    // Validate responseMode
+    if (!['base64', 'binary'].includes(responseMode)) {
+      throw new Error('responseMode must be "base64" or "binary"');
+    }
 
-    // Send success response
-    res.json(successResponse(base64Image, {
+    // Read output image
+    const imageBuffer = await fs.readFile(outputPath);
+
+    // Prepare metadata
+    const metadata = {
       format: outputExt,
       mode: cropMode,
       ...(cropMode === 'manual' && {
@@ -99,7 +104,18 @@ router.post('/', upload.single('image'), async (req, res, next) => {
         x: parseInt(x, 10),
         y: parseInt(y, 10)
       })
-    }));
+    };
+
+    // Send response based on mode
+    if (responseMode === 'binary') {
+      binaryResponse(res, imageBuffer, metadata, outputExt, `cropped.${outputExt}`);
+    } else {
+      const base64Image = imageBuffer.toString('base64');
+      res.json(successResponse(base64Image, metadata));
+    }
+
+    // Cleanup temp files
+    await cleanupFiles([inputPath, outputPath]);
   } catch (error) {
     // Cleanup on error
     if (inputPath || outputPath) {

@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
-const { validateFile, validateParams, validateNumeric } = require('../utils/response');
-const { successResponse } = require('../utils/response');
+const fs = require('fs').promises;
+const { validateFile, validateParams, validateNumeric, successResponse, binaryResponse } = require('../utils/response');
 const { saveTempFile, readFileAsBase64, cleanupFiles, getExtension } = require('../utils/fileHandler');
 const { convertFormat } = require('../utils/imagemagick');
 
@@ -71,17 +71,33 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     const qualityNum = quality ? parseInt(quality, 10) : null;
     await convertFormat(inputPath, outputPath, targetFormat, qualityNum);
 
-    // Read output as base64
-    const base64Image = await readFileAsBase64(outputPath);
+    // Get response mode
+    const responseMode = req.query.responseMode || 'base64';
+
+    // Validate responseMode
+    if (!['base64', 'binary'].includes(responseMode)) {
+      throw new Error('responseMode must be "base64" or "binary"');
+    }
+
+    // Read output image
+    const imageBuffer = await fs.readFile(outputPath);
+
+    // Send response based on mode
+    if (responseMode === 'binary') {
+      binaryResponse(res, imageBuffer, {
+        format: outputExt,
+        quality: qualityNum || 'default'
+      }, outputExt, `converted.${outputExt}`);
+    } else {
+      const base64Image = imageBuffer.toString('base64');
+      res.json(successResponse(base64Image, {
+        format: outputExt,
+        quality: qualityNum || 'default'
+      }));
+    }
 
     // Cleanup temp files
     await cleanupFiles([inputPath, outputPath]);
-
-    // Send success response
-    res.json(successResponse(base64Image, {
-      format: outputExt,
-      quality: qualityNum || 'default'
-    }));
   } catch (error) {
     // Cleanup on error
     if (inputPath || outputPath) {

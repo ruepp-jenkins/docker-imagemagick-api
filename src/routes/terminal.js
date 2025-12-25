@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
-const { validateFile } = require('../utils/response');
-const { successResponse } = require('../utils/response');
+const fs = require('fs').promises;
+const { validateFile, successResponse, binaryResponse } = require('../utils/response');
 const { saveTempFile, readFileAsBase64, cleanupFiles, getExtension } = require('../utils/fileHandler');
 const { terminalDither } = require('../utils/imagemagick');
 
@@ -44,17 +44,33 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     // Apply terminal dithering effect
     await terminalDither(inputPath, outputPath);
 
-    // Read output as base64
-    const base64Image = await readFileAsBase64(outputPath);
+    // Get response mode
+    const responseMode = req.query.responseMode || 'base64';
+
+    // Validate responseMode
+    if (!['base64', 'binary'].includes(responseMode)) {
+      throw new Error('responseMode must be "base64" or "binary"');
+    }
+
+    // Read output image
+    const imageBuffer = await fs.readFile(outputPath);
+
+    // Send response based on mode
+    if (responseMode === 'binary') {
+      binaryResponse(res, imageBuffer, {
+        format: 'png',
+        effect: 'terminal-dithering'
+      }, 'png', 'terminal-dithered.png');
+    } else {
+      const base64Image = imageBuffer.toString('base64');
+      res.json(successResponse(base64Image, {
+        format: 'png',
+        effect: 'terminal-dithering'
+      }));
+    }
 
     // Cleanup temp files
     await cleanupFiles([inputPath, outputPath]);
-
-    // Send success response
-    res.json(successResponse(base64Image, {
-      format: 'png',
-      effect: 'terminal-dithering'
-    }));
   } catch (error) {
     // Cleanup on error
     if (inputPath || outputPath) {

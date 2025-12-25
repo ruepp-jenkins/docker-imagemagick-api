@@ -86,10 +86,42 @@ const validateFile = (file) => {
   }
 };
 
+/**
+ * Send binary image response with metadata in HTTP headers
+ * @param {Object} res - Express response object
+ * @param {Buffer} imageBuffer - Binary image data
+ * @param {Object} metadata - Metadata object (format, width, height, etc.)
+ * @param {string} format - Image format/extension
+ * @param {string} filename - Filename for Content-Disposition header
+ */
+const binaryResponse = (res, imageBuffer, metadata, format, filename) => {
+  const { getMimeType } = require('./fileHandler');
+  const mimeType = getMimeType(format);
+
+  // Set standard headers
+  res.setHeader('Content-Type', mimeType);
+  res.setHeader('Content-Length', imageBuffer.length);
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+  // Set custom metadata headers (prefixed with X-Image-)
+  res.setHeader('X-Image-Success', '1');
+
+  // Add all metadata fields as custom headers
+  Object.keys(metadata).forEach(key => {
+    const headerName = `X-Image-${key.charAt(0).toUpperCase() + key.slice(1)}`;
+    res.setHeader(headerName, String(metadata[key]));
+  });
+
+  // Send binary image data
+  res.status(200);
+  res.send(imageBuffer);
+};
+
 module.exports = {
   successResponse,
   errorResponse,
   validateParams,
   validateNumeric,
-  validateFile
+  validateFile,
+  binaryResponse
 };
