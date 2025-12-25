@@ -29,14 +29,14 @@ docker-compose up -d
 curl http://localhost:3000/health
 
 # 4. Open Swagger UI in browser for testing
-# http://localhost:3000/
+# http://localhost:3000/ (redirects to /swagger)
 ```
 
 ### Swagger UI - Browser-based Testing
 
 After starting, you can test the API directly in your browser:
 
-1. Open **http://localhost:3000/** in your browser
+1. Open **http://localhost:3000/** in your browser (automatically redirects to /swagger)
 2. You'll see interactive API documentation
 3. Click on an endpoint (e.g. `/terminal`)
 4. Click "Try it out"

@@ -43,14 +43,19 @@ app.use((req, res, next) => {
   next();
 });
 
-// Swagger UI at root (no auth required for documentation)
-app.get('/', swaggerUi.setup(swaggerDocument, {
+// Redirect root to Swagger UI
+app.get('/', (req, res) => {
+  res.redirect('/swagger');
+});
+
+// Swagger UI at /swagger (no auth required for documentation)
+app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'ImageMagick API Documentation',
   customfavIcon: '/favicon.ico'
 }));
 
-// Apply authentication middleware globally (except for / and /health)
+// Apply authentication middleware globally (except for /, /swagger, and /health)
 app.use(authMiddleware);
 
 // Health check endpoint (no auth required)
@@ -95,7 +100,8 @@ app.listen(PORT, () => {
   Max File Size:  ${(parseInt(process.env.MAX_FILE_SIZE || '52428800', 10) / 1024 / 1024).toFixed(0)} MB
 
   Endpoints:
-  - GET  /              Swagger UI (Browser-based testing)
+  - GET  /              Redirect to Swagger UI
+  - GET  /swagger       Swagger UI (Browser-based testing)
   - GET  /health        Health check
   - POST /terminal      Terminal dithering effect
   - POST /resize        Resize images

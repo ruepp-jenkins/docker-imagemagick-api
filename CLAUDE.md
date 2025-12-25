@@ -101,7 +101,8 @@ Jenkinsfile                  # CI/CD pipeline definition
 ### [src/server.js](src/server.js)
 - **Purpose**: Express application initialization and configuration
 - **Key Responsibilities**:
-  - Load Swagger YAML and mount at `/` (root)
+  - Load Swagger YAML and mount at `/swagger`
+  - Redirect `/` to `/swagger`
   - Configure multer with memory storage + file size limits
   - Apply auth middleware (if `API_TOKEN` env var set)
   - Mount all route handlers
@@ -114,7 +115,7 @@ Jenkinsfile                  # CI/CD pipeline definition
 - **Behavior**:
   - If `API_TOKEN` env var not set → skip authentication
   - If set → validate `Authorization: Bearer <token>` header
-  - Excludes `/` (Swagger UI) and `/health` endpoints
+  - Excludes `/`, `/swagger` and `/health` endpoints
 - **Error Response**: `401 Unauthorized` with JSON error
 
 ### [src/utils/imagemagick.js](src/utils/imagemagick.js)
@@ -242,6 +243,11 @@ module.exports = router;
 - **Response**: `{ status: "healthy", uptime: seconds }`
 
 ### GET /
+- **Purpose**: Redirect to Swagger UI
+- **Authentication**: None
+- **Response**: 302 redirect to `/swagger`
+
+### GET /swagger
 - **Purpose**: Swagger UI interactive documentation
 - **Authentication**: None
 - **Source**: [swagger.yml](swagger.yml) (OpenAPI 3.0)
@@ -366,7 +372,7 @@ module.exports = router;
 ## Testing Considerations
 
 ### Manual Testing
-- Swagger UI at `/` provides interactive testing interface
+- Swagger UI at `/swagger` (or navigate to `/` which redirects) provides interactive testing interface
 - Health check: `curl http://localhost:3000/health`
 - Example resize:
   ```bash
