@@ -1,107 +1,107 @@
 # ImageMagick API
 
-Eine RESTful API für ImageMagick-Funktionalitäten, die in einem Docker-Container läuft.
+A RESTful API for ImageMagick functionality running in a Docker container.
 
 ## Features
 
-- **Swagger UI** - Interaktive API-Dokumentation und Browser-basiertes Testen
-- **Terminal Dithering Effect** - Floyd-Steinberg Dithering für Terminal-Anzeige
-- **Image Resize** - Größenänderung mit automatischer Seitenverhältnis-Berechnung
-- **Format Conversion** - Konvertierung zwischen verschiedenen Bildformaten
-- **Rotation & Flip** - Bilder drehen und spiegeln
-- **Image Cropping** - Manuelle oder automatische Zuschneidung
-- **Image Optimization** - Qualitätsoptimierung für kleinere Dateigrößen
-- **Optional Authentication** - Token-basierte Authentifizierung
-- **Parallel Processing** - Asynchrone Verarbeitung mehrerer Anfragen
+- **Swagger UI** - Interactive API documentation and browser-based testing
+- **Terminal Dithering Effect** - Floyd-Steinberg dithering for terminal display
+- **Image Resize** - Resize with automatic aspect ratio calculation
+- **Format Conversion** - Convert between different image formats
+- **Rotation & Flip** - Rotate and flip images
+- **Image Cropping** - Manual or automatic cropping
+- **Image Optimization** - Quality optimization for smaller file sizes
+- **Optional Authentication** - Token-based authentication
+- **Parallel Processing** - Asynchronous processing of multiple requests
 
 ## Quick Start
 
-### Mit Docker Compose (empfohlen)
+### With Docker Compose (recommended)
 
 ```bash
-# 1. Repository klonen oder Dateien herunterladen
+# 1. Clone repository or download files
 cd imagemagick-api
 
-# 2. Container bauen und starten
+# 2. Build and start container
 docker-compose up -d
 
-# 3. API ist verfügbar auf http://localhost:3000
+# 3. API is available at http://localhost:3000
 curl http://localhost:3000/health
 
-# 4. Öffnen Sie Swagger UI im Browser zum Testen
+# 4. Open Swagger UI in browser for testing
 # http://localhost:3000/api-docs
 ```
 
-### Swagger UI - Browser-basiertes Testen
+### Swagger UI - Browser-based Testing
 
-Nach dem Start können Sie die API direkt im Browser testen:
+After starting, you can test the API directly in your browser:
 
-1. Öffnen Sie **http://localhost:3000/api-docs** in Ihrem Browser
-2. Sie sehen eine interaktive API-Dokumentation
-3. Klicken Sie auf einen Endpunkt (z.B. `/terminal`)
-4. Klicken Sie auf "Try it out"
-5. Laden Sie ein Bild hoch und klicken Sie auf "Execute"
-6. Die Response wird direkt im Browser angezeigt
+1. Open **http://localhost:3000/api-docs** in your browser
+2. You'll see interactive API documentation
+3. Click on an endpoint (e.g. `/terminal`)
+4. Click "Try it out"
+5. Upload an image and click "Execute"
+6. The response will be displayed directly in the browser
 
-**Authentifizierung in Swagger:**
+**Authentication in Swagger:**
 
-- Falls `API_TOKEN` gesetzt ist, klicken Sie auf "Authorize" (oben rechts)
-- Geben Sie Ihren Token ein (ohne "Bearer")
-- Klicken Sie auf "Authorize" und schließen Sie das Fenster
+- If `API_TOKEN` is set, click "Authorize" (top right)
+- Enter your token (without "Bearer")
+- Click "Authorize" and close the window
 
 ````
 
-### Mit Docker
+### With Docker
 
 ```bash
-# Image bauen
+# Build image
 docker build -t imagemagick-api .
 
-# Container starten
+# Start container
 docker run -d -p 3000:3000 --name imagemagick-api imagemagick-api
 
-# Mit Authentifizierung
+# With authentication
 docker run -d -p 3000:3000 -e API_TOKEN="your-secret-token" imagemagick-api
 ````
 
-## Konfiguration
+## Configuration
 
-### Umgebungsvariablen
+### Environment Variables
 
-| Variable        | Beschreibung                                     | Default            |
-| --------------- | ------------------------------------------------ | ------------------ |
-| `API_TOKEN`     | Optional: API-Token für Authentifizierung        | (leer, keine Auth) |
-| `PORT`          | Server-Port                                      | 3000               |
-| `NODE_ENV`      | Umgebung (production/development)                | production         |
-| `MAX_FILE_SIZE` | Maximale Upload-Größe in Bytes                   | 52428800 (50 MB)   |
-| `CLEANUP_DELAY` | Verzögerung beim Löschen temporärer Dateien (ms) | 0                  |
+| Variable        | Description                                  | Default            |
+| --------------- | -------------------------------------------- | ------------------ |
+| `API_TOKEN`     | Optional: API token for authentication      | (empty, no auth)   |
+| `PORT`          | Server port                                  | 3000               |
+| `NODE_ENV`      | Environment (production/development)         | production         |
+| `MAX_FILE_SIZE` | Maximum upload size in bytes                 | 52428800 (50 MB)   |
+| `CLEANUP_DELAY` | Delay for deleting temporary files (ms)      | 0                  |
 
-### Authentifizierung aktivieren
+### Enable Authentication
 
-Bearbeiten Sie die `docker-compose.yml` und setzen Sie `API_TOKEN`:
+Edit `docker-compose.yml` and set `API_TOKEN`:
 
 ```yaml
 environment:
-  - API_TOKEN=mein-geheimes-token-12345
+  - API_TOKEN=my-secret-token-12345
 ```
 
-Oder beim direkten Start mit Docker:
+Or when starting directly with Docker:
 
 ```bash
-docker run -d -p 3000:3000 -e API_TOKEN="mein-geheimes-token-12345" imagemagick-api
+docker run -d -p 3000:3000 -e API_TOKEN="my-secret-token-12345" imagemagick-api
 ```
 
-Anfragen müssen dann den Token im Header enthalten:
+Requests must then include the token in the header:
 
 ```bash
-Authorization: Bearer mein-geheimes-token-12345
+Authorization: Bearer my-secret-token-12345
 ```
 
-## API Endpunkte
+## API Endpoints
 
 ### GET /
 
-API-Informationen und verfügbare Endpunkte
+API information and available endpoints
 
 ```bash
 curl http://localhost:3000/
@@ -109,7 +109,7 @@ curl http://localhost:3000/
 
 ### GET /health
 
-Health-Check Endpunkt
+Health check endpoint
 
 ```bash
 curl http://localhost:3000/health
@@ -117,17 +117,17 @@ curl http://localhost:3000/health
 
 ### POST /terminal
 
-Terminal-Dithering-Effekt anwenden (Floyd-Steinberg Dithering)
+Apply terminal dithering effect (Floyd-Steinberg dithering)
 
-**Parameter:**
+**Parameters:**
 
-- `image` (file, required) - Bilddatei
+- `image` (file, required) - Image file
 
-**Beispiel:**
+**Example:**
 
 ```bash
 curl -X POST http://localhost:3000/terminal \
-  -F "image=@innenstadt.png" \
+  -F "image=@downtown.png" \
   > response.json
 ```
 
@@ -144,22 +144,22 @@ curl -X POST http://localhost:3000/terminal \
 
 ### POST /resize
 
-Bildgröße ändern mit optionaler Seitenverhältnis-Berechnung
+Resize image with optional aspect ratio calculation
 
-**Parameter:**
+**Parameters:**
 
-- `image` (file, required) - Bilddatei
-- `width` (number, optional) - Zielbreite in Pixel
-- `height` (number, optional) - Zielhöhe in Pixel
-- `format` (string, required) - Ausgabeformat (png, jpg, webp, etc.)
+- `image` (file, required) - Image file
+- `width` (number, optional) - Target width in pixels
+- `height` (number, optional) - Target height in pixels
+- `format` (string, required) - Output format (png, jpg, webp, etc.)
 
-**Verhalten:**
+**Behavior:**
 
-- Beide angegeben: Exakte Größe (kann verzerren)
-- Nur width: Höhe wird automatisch berechnet
-- Nur height: Breite wird automatisch berechnet
+- Both specified: Exact dimensions (may distort)
+- Only width: Height calculated automatically
+- Only height: Width calculated automatically
 
-**Beispiel:**
+**Example:**
 
 ```bash
 curl -X POST http://localhost:3000/resize \
@@ -183,15 +183,15 @@ curl -X POST http://localhost:3000/resize \
 
 ### POST /convert
 
-Bildformat konvertieren
+Convert image format
 
-**Parameter:**
+**Parameters:**
 
-- `image` (file, required) - Bilddatei
-- `format` (string, required) - Zielformat (png, jpg, webp, gif, bmp, tiff, svg)
-- `quality` (number, optional) - Qualität für JPG/WebP (1-100)
+- `image` (file, required) - Image file
+- `format` (string, required) - Target format (png, jpg, webp, gif, bmp, tiff, svg)
+- `quality` (number, optional) - Quality for JPG/WebP (1-100)
 
-**Beispiel:**
+**Example:**
 
 ```bash
 curl -X POST http://localhost:3000/convert \
@@ -214,18 +214,18 @@ curl -X POST http://localhost:3000/convert \
 
 ### POST /rotate
 
-Bild drehen oder spiegeln
+Rotate or flip image
 
-**Parameter:**
+**Parameters:**
 
-- `image` (file, required) - Bilddatei
-- `operation` (string, required) - "rotate" oder "flip"
+- `image` (file, required) - Image file
+- `operation` (string, required) - "rotate" or "flip"
 - `value` (string/number, required) -
-  - Bei rotate: 90, 180, 270 (Grad)
-  - Bei flip: "horizontal" oder "vertical"
-- `format` (string, required) - Ausgabeformat
+  - For rotate: 90, 180, 270 (degrees)
+  - For flip: "horizontal" or "vertical"
+- `format` (string, required) - Output format
 
-**Beispiel Rotation:**
+**Example Rotation:**
 
 ```bash
 curl -X POST http://localhost:3000/rotate \
@@ -236,7 +236,7 @@ curl -X POST http://localhost:3000/rotate \
   > response.json
 ```
 
-**Beispiel Flip:**
+**Example Flip:**
 
 ```bash
 curl -X POST http://localhost:3000/rotate \
@@ -261,22 +261,22 @@ curl -X POST http://localhost:3000/rotate \
 
 ### POST /crop
 
-Bild zuschneiden
+Crop image
 
-**Parameter:**
+**Parameters:**
 
-- `image` (file, required) - Bilddatei
-- `mode` (string, required) - "manual" oder "trim"
-- `format` (string, required) - Ausgabeformat
+- `image` (file, required) - Image file
+- `mode` (string, required) - "manual" or "trim"
+- `format` (string, required) - Output format
 
-**Für mode="manual":**
+**For mode="manual":**
 
-- `width` (number, required) - Breite des Zuschnitts
-- `height` (number, required) - Höhe des Zuschnitts
-- `x` (number, required) - X-Offset
-- `y` (number, required) - Y-Offset
+- `width` (number, required) - Crop width
+- `height` (number, required) - Crop height
+- `x` (number, required) - X offset
+- `y` (number, required) - Y offset
 
-**Beispiel Manual Crop:**
+**Example Manual Crop:**
 
 ```bash
 curl -X POST http://localhost:3000/crop \
@@ -290,7 +290,7 @@ curl -X POST http://localhost:3000/crop \
   > response.json
 ```
 
-**Beispiel Auto-Trim:**
+**Example Auto-Trim:**
 
 ```bash
 curl -X POST http://localhost:3000/crop \
@@ -317,15 +317,15 @@ curl -X POST http://localhost:3000/crop \
 
 ### POST /optimize
 
-Bildqualität und Dateigröße optimieren
+Optimize image quality and file size
 
-**Parameter:**
+**Parameters:**
 
-- `image` (file, required) - Bilddatei
-- `quality` (number, required) - Qualität 1-100 (niedriger = kleinere Datei)
-- `format` (string, required) - Ausgabeformat
+- `image` (file, required) - Image file
+- `quality` (number, required) - Quality 1-100 (lower = smaller file)
+- `format` (string, required) - Output format
 
-**Beispiel:**
+**Example:**
 
 ```bash
 curl -X POST http://localhost:3000/optimize \
@@ -348,9 +348,9 @@ curl -X POST http://localhost:3000/optimize \
 
 ## Response Format
 
-Alle Endpunkte liefern JSON-Responses:
+All endpoints return JSON responses:
 
-### Erfolg
+### Success
 
 ```json
 {
@@ -361,18 +361,18 @@ Alle Endpunkte liefern JSON-Responses:
 }
 ```
 
-### Fehler
+### Error
 
 ```json
 {
   "success": 0,
-  "errormessage": "Fehlerbeschreibung"
+  "errormessage": "Error description"
 }
 ```
 
-## Base64 zu Datei konvertieren
+## Converting Base64 to File
 
-Das `image` Feld enthält Base64-kodierte Bilddaten. So konvertieren Sie diese:
+The `image` field contains base64-encoded image data. Here's how to convert it:
 
 ### JavaScript/Node.js
 
@@ -404,7 +404,7 @@ with open('output.png', 'wb') as f:
 cat response.json | jq -r '.image' | base64 -d > output.png
 ```
 
-## Unterstützte Bildformate
+## Supported Image Formats
 
 - PNG
 - JPEG/JPG
@@ -414,109 +414,109 @@ cat response.json | jq -r '.image' | base64 -d > output.png
 - TIFF
 - SVG
 
-## Architektur
+## Architecture
 
 ```
 imagemagick-api/
 ├── src/
 │   ├── middleware/
-│   │   ├── auth.js              # Authentifizierungs-Middleware
-│   │   └── errorHandler.js      # Globaler Error Handler
+│   │   ├── auth.js              # Authentication middleware
+│   │   └── errorHandler.js      # Global error handler
 │   ├── routes/
-│   │   ├── terminal.js          # Terminal Dithering Endpoint
-│   │   ├── resize.js            # Resize Endpoint
-│   │   ├── convert.js           # Format Conversion Endpoint
-│   │   ├── rotate.js            # Rotation/Flip Endpoint
-│   │   ├── crop.js              # Crop Endpoint
-│   │   └── optimize.js          # Optimization Endpoint
+│   │   ├── terminal.js          # Terminal dithering endpoint
+│   │   ├── resize.js            # Resize endpoint
+│   │   ├── convert.js           # Format conversion endpoint
+│   │   ├── rotate.js            # Rotation/Flip endpoint
+│   │   ├── crop.js              # Crop endpoint
+│   │   └── optimize.js          # Optimization endpoint
 │   ├── utils/
-│   │   ├── fileHandler.js       # Datei-Management Utilities
-│   │   ├── imagemagick.js       # ImageMagick Command Wrapper
-│   │   └── response.js          # Response Formatting
-│   └── server.js                # Express Server & Routing
-├── tmpfiles/                    # Temporäre Dateien (automatisch erstellt)
-├── Dockerfile                   # Docker Build Konfiguration
-├── docker-compose.yml           # Docker Compose Konfiguration
-├── package.json                 # Node.js Dependencies
-└── .env.example                 # Beispiel Konfiguration
+│   │   ├── fileHandler.js       # File management utilities
+│   │   ├── imagemagick.js       # ImageMagick command wrapper
+│   │   └── response.js          # Response formatting
+│   └── server.js                # Express server & routing
+├── tmpfiles/                    # Temporary files (auto-created)
+├── Dockerfile                   # Docker build configuration
+├── docker-compose.yml           # Docker Compose configuration
+├── package.json                 # Node.js dependencies
+└── .env.example                 # Example configuration
 ```
 
-## Fehlerbehandlung
+## Error Handling
 
-Die API behandelt verschiedene Fehlertypen:
+The API handles various error types:
 
-- **401 Unauthorized** - Fehlender Authorization Header
-- **403 Forbidden** - Ungültiger API-Token
-- **413 Payload Too Large** - Datei überschreitet MAX_FILE_SIZE
-- **400 Bad Request** - Fehlende oder ungültige Parameter
-- **404 Not Found** - Unbekannter Endpunkt
-- **500 Internal Server Error** - ImageMagick oder Server-Fehler
+- **401 Unauthorized** - Missing Authorization header
+- **403 Forbidden** - Invalid API token
+- **413 Payload Too Large** - File exceeds MAX_FILE_SIZE
+- **400 Bad Request** - Missing or invalid parameters
+- **404 Not Found** - Unknown endpoint
+- **500 Internal Server Error** - ImageMagick or server error
 
-## Entwicklung
+## Development
 
-### Lokale Entwicklung ohne Docker
+### Local Development without Docker
 
 ```bash
-# Dependencies installieren
+# Install dependencies
 npm install
 
-# ImageMagick installieren (je nach OS)
+# Install ImageMagick (depending on OS)
 # macOS:
 brew install imagemagick
 
 # Ubuntu/Debian:
 sudo apt-get install imagemagick
 
-# Development Server starten
+# Start development server
 npm run dev
 ```
 
-### Logs anzeigen
+### View Logs
 
 ```bash
-# Docker Compose Logs
+# Docker Compose logs
 docker-compose logs -f
 
-# Docker Logs
+# Docker logs
 docker logs -f imagemagick-api
 ```
 
-## Performance & Skalierung
+## Performance & Scaling
 
-- **Parallele Verarbeitung**: Node.js verarbeitet mehrere Anfragen asynchron
-- **Resource Limits**: In docker-compose.yml konfigurierbar
-- **Automatisches Cleanup**: Temporäre Dateien werden sofort gelöscht
-- **Health Check**: Container-Health-Monitoring integriert
+- **Parallel Processing**: Node.js processes multiple requests asynchronously
+- **Resource Limits**: Configurable in docker-compose.yml
+- **Automatic Cleanup**: Temporary files are deleted immediately
+- **Health Check**: Container health monitoring integrated
 
-## Sicherheit
+## Security
 
-- **Optional Authentication**: Token-basierte Authentifizierung
-- **File Size Limits**: Schutz vor zu großen Uploads
-- **MIME Type Validation**: Nur Bilddateien werden akzeptiert
-- **Temporary File Isolation**: Sichere Verarbeitung in tmpfiles/
-- **Error Information**: Keine sensitiven Daten in Fehlermeldungen
+- **Optional Authentication**: Token-based authentication
+- **File Size Limits**: Protection against overly large uploads
+- **MIME Type Validation**: Only image files are accepted
+- **Temporary File Isolation**: Secure processing in tmpfiles/
+- **Error Information**: No sensitive data in error messages
 
 ## Troubleshooting
 
-### Container startet nicht
+### Container won't start
 
 ```bash
 docker-compose logs
 ```
 
-### ImageMagick Befehle funktionieren nicht
+### ImageMagick commands don't work
 
-Prüfen Sie ob alle Dependencies installiert sind:
+Check if all dependencies are installed:
 
 ```bash
 docker exec -it imagemagick-api sh
 magick --version
 ```
 
-### Temporäre Dateien werden nicht gelöscht
+### Temporary files are not deleted
 
-Prüfen Sie `CLEANUP_DELAY` in der Konfiguration.
+Check `CLEANUP_DELAY` in the configuration.
 
 ## Support
 
-Bei Problemen oder Fragen erstellen Sie bitte ein Issue im Repository.
+For issues or questions, please create an issue in the repository.

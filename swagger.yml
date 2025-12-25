@@ -9,10 +9,23 @@ info:
     name: MIT
 
 servers:
+  - url: '{protocol}://{host}:{port}'
+    description: Configurable server
+    variables:
+      protocol:
+        default: http
+        enum:
+          - http
+          - https
+        description: HTTP protocol
+      host:
+        default: localhost
+        description: Server hostname or IP address
+      port:
+        default: '3000'
+        description: Server port
   - url: http://localhost:3000
     description: Local development server
-  - url: http://your-production-url:3000
-    description: Production server
 
 components:
   securitySchemes:
