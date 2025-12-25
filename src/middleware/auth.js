@@ -1,6 +1,7 @@
 /**
  * Authentication Middleware
  * Checks for API token if configured in environment
+ * Excludes / (Swagger UI) and /health endpoints from authentication
  */
 
 const authMiddleware = (req, res, next) => {
@@ -8,6 +9,11 @@ const authMiddleware = (req, res, next) => {
 
   // If no token is configured, allow all requests
   if (!apiToken || apiToken.trim() === '') {
+    return next();
+  }
+
+  // Exclude Swagger UI (/) and health check endpoint from authentication
+  if (req.path === '/health' || req.path === '/') {
     return next();
   }
 
