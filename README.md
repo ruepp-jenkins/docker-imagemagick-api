@@ -68,13 +68,13 @@ docker run -d -p 3000:3000 -e API_TOKEN="your-secret-token" imagemagick-api
 
 ### Environment Variables
 
-| Variable        | Description                                  | Default            |
-| --------------- | -------------------------------------------- | ------------------ |
-| `API_TOKEN`     | Optional: API token for authentication      | (empty, no auth)   |
-| `PORT`          | Server port                                  | 3000               |
-| `NODE_ENV`      | Environment (production/development)         | production         |
-| `MAX_FILE_SIZE` | Maximum upload size in bytes                 | 52428800 (50 MB)   |
-| `CLEANUP_DELAY` | Delay for deleting temporary files (ms)      | 0                  |
+| Variable        | Description                             | Default          |
+| --------------- | --------------------------------------- | ---------------- |
+| `API_TOKEN`     | Optional: API token for authentication  | (empty, no auth) |
+| `PORT`          | Server port                             | 3000             |
+| `NODE_ENV`      | Environment (production/development)    | production       |
+| `MAX_FILE_SIZE` | Maximum upload size in bytes            | 52428800 (50 MB) |
+| `CLEANUP_DELAY` | Delay for deleting temporary files (ms) | 0                |
 
 ### Enable Authentication
 
@@ -151,13 +151,13 @@ curl -X POST "http://localhost:3000/resize?responseMode=binary" \
 - **Headers**:
   - `Content-Type`: image/png (or image/jpeg, etc.)
   - `Content-Disposition`: attachment; filename="resized.png"
-  - `X-Image-Success`: 1
   - `X-Image-Mimetype`: image/png (matches Content-Type)
   - `X-Image-Format`: png
   - `X-Image-Width`: 800 (or "auto")
   - `X-Image-Height`: 600 (or "auto")
 
 **Benefits:**
+
 - ~33% smaller response size (no base64 overhead)
 - ~15% faster processing (no encoding step)
 - Direct binary image data (no client-side decoding needed)
@@ -166,25 +166,27 @@ curl -X POST "http://localhost:3000/resize?responseMode=binary" \
 **Reading Headers Example (Node.js):**
 
 ```javascript
-const response = await fetch('http://localhost:3000/resize?responseMode=binary', {
-  method: 'POST',
-  body: formData
-});
+const response = await fetch(
+  "http://localhost:3000/resize?responseMode=binary",
+  {
+    method: "POST",
+    body: formData,
+  }
+);
 
 // Get metadata from headers
 const metadata = {
-  success: response.headers.get('X-Image-Success'),
-  mimetype: response.headers.get('X-Image-Mimetype'),
-  format: response.headers.get('X-Image-Format'),
-  width: response.headers.get('X-Image-Width'),
-  height: response.headers.get('X-Image-Height')
+  mimetype: response.headers.get("X-Image-Mimetype"),
+  format: response.headers.get("X-Image-Format"),
+  width: response.headers.get("X-Image-Width"),
+  height: response.headers.get("X-Image-Height"),
 };
 
 // Get binary image data
 const imageBuffer = await response.arrayBuffer();
 
 // Save to file
-await fs.writeFile('output.png', Buffer.from(imageBuffer));
+await fs.writeFile("output.png", Buffer.from(imageBuffer));
 ```
 
 **Reading Headers Example (curl):**

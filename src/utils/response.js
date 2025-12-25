@@ -104,7 +104,6 @@ const binaryResponse = (res, imageBuffer, metadata, format, filename) => {
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
   // Set custom metadata headers (prefixed with X-Image-)
-  res.setHeader('X-Image-Success', '1');
   res.setHeader('X-Image-Mimetype', mimeType);
 
   // Add all metadata fields as custom headers

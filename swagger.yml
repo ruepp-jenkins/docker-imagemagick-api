@@ -9,7 +9,7 @@ info:
     name: MIT
 
 servers:
-  - url: '{protocol}://{host}:{port}'
+  - url: "{protocol}://{host}:{port}"
     description: Configurable server
     variables:
       protocol:
@@ -22,7 +22,7 @@ servers:
         default: localhost
         description: Server hostname or IP address
       port:
-        default: '3000'
+        default: "3000"
         description: Server port
   - url: http://localhost:3000
     description: Local development server
@@ -98,12 +98,12 @@ paths:
       description: Check if the API is running and healthy
       security: []
       responses:
-        '200':
+        "200":
           description: API is healthy
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthResponse'
+                $ref: "#/components/schemas/HealthResponse"
 
   /:
     get:
@@ -112,7 +112,7 @@ paths:
       summary: API information
       description: Get information about available endpoints
       responses:
-        '200':
+        "200":
           description: API information retrieved successfully
           content:
             application/json:
@@ -148,13 +148,13 @@ paths:
               required:
                 - image
       responses:
-        '200':
+        "200":
           description: Image processed successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/SuccessResponse'
+                  - $ref: "#/components/schemas/SuccessResponse"
                   - type: object
                     properties:
                       effect:
@@ -168,22 +168,21 @@ paths:
               description: |
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
-                - X-Image-Success: 1
                 - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: png
                 - X-Image-Effect: terminal-dithering
-        '400':
+        "400":
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /resize:
     post:
@@ -228,13 +227,13 @@ paths:
               required:
                 - image
       responses:
-        '200':
+        "200":
           description: Image resized successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/SuccessResponse'
+                  - $ref: "#/components/schemas/SuccessResponse"
                   - type: object
                     properties:
                       width:
@@ -249,17 +248,16 @@ paths:
               description: |
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
-                - X-Image-Success: 1
                 - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: png
                 - X-Image-Width: 800 (or "auto")
                 - X-Image-Height: 600 (or "auto")
-        '400':
+        "400":
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /convert:
     post:
@@ -302,13 +300,13 @@ paths:
                 - image
                 - format
       responses:
-        '200':
+        "200":
           description: Image converted successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/SuccessResponse'
+                  - $ref: "#/components/schemas/SuccessResponse"
                   - type: object
                     properties:
                       quality:
@@ -321,16 +319,15 @@ paths:
               description: |
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
-                - X-Image-Success: 1
                 - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: jpg
                 - X-Image-Quality: 85 (or "default")
-        '400':
+        "400":
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /rotate:
     post:
@@ -375,13 +372,13 @@ paths:
                 - operation
                 - value
       responses:
-        '200':
+        "200":
           description: Image transformed successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/SuccessResponse'
+                  - $ref: "#/components/schemas/SuccessResponse"
                   - type: object
                     properties:
                       operation:
@@ -396,17 +393,16 @@ paths:
               description: |
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
-                - X-Image-Success: 1
                 - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: png
                 - X-Image-Operation: rotate
                 - X-Image-Value: 90
-        '400':
+        "400":
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /crop:
     post:
@@ -466,13 +462,13 @@ paths:
                 - image
                 - mode
       responses:
-        '200':
+        "200":
           description: Image cropped successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/SuccessResponse'
+                  - $ref: "#/components/schemas/SuccessResponse"
                   - type: object
                     properties:
                       mode:
@@ -485,17 +481,16 @@ paths:
               description: |
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
-                - X-Image-Success: 1
                 - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: png
                 - X-Image-Mode: manual (or trim)
                 - Additional headers for manual mode: X-Image-Width, X-Image-Height, X-Image-X, X-Image-Y
-        '400':
+        "400":
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /optimize:
     post:
@@ -533,13 +528,13 @@ paths:
                 - image
                 - quality
       responses:
-        '200':
+        "200":
           description: Image optimized successfully
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/SuccessResponse'
+                  - $ref: "#/components/schemas/SuccessResponse"
                   - type: object
                     properties:
                       quality:
@@ -552,16 +547,15 @@ paths:
               description: |
                 Returned when responseMode=binary. Raw binary image data with metadata in HTTP headers:
                 - Content-Type: image/* (image/png, image/jpeg, etc.)
-                - X-Image-Success: 1
                 - X-Image-Mimetype: image/png (matches Content-Type)
                 - X-Image-Format: jpg
                 - X-Image-Quality: 70
-        '400':
+        "400":
           description: Bad request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
 tags:
   - name: System
