@@ -23,6 +23,32 @@ const swaggerDocument = YAML.load(path.join(__dirname, '../swagger.yml'));
 // Parse JSON bodies (for non-multipart requests)
 app.use(express.json());
 
+// Request logging middleware
+app.use((req, res, next) => {
+  const startTime = Date.now();
+
+  // Capture the original end function
+  const originalEnd = res.end;
+
+  // Override res.end to log after response is sent
+  res.end = function(...args) {
+    const duration = Date.now() - startTime;
+    const ip = req.ip || req.socket?.remoteAddress || 'unknown';
+    const method = req.method;
+    const path = req.path;
+    const status = res.statusCode;
+
+    // Log format: [timestamp] IP -> METHOD /path - STATUS (duration ms)
+    const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    console.log(`[${timestamp}] ${ip} -> ${method} ${path} - ${status} (${duration}ms)`);
+
+    // Call the original end function
+    originalEnd.apply(res, args);
+  };
+
+  next();
+});
+
 // Swagger UI at root (no auth required for documentation)
 app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
   customCss: '.swagger-ui .topbar { display: none }',
