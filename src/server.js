@@ -44,13 +44,13 @@ app.use((req, res, next) => {
 });
 
 // Swagger UI at root (no auth required for documentation)
-app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+app.get('/', swaggerUi.setup(swaggerDocument, {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'ImageMagick API Documentation',
   customfavIcon: '/favicon.ico'
 }));
 
-// Apply authentication middleware globally (except for /)
+// Apply authentication middleware globally (except for / and /health)
 app.use(authMiddleware);
 
 // Health check endpoint (no auth required)
