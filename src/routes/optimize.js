@@ -21,7 +21,6 @@ const upload = multer({
  *   - Body (multipart/form-data):
  *     - image: Image file (required)
  *     - quality: Quality percentage 1-100 (required, lower = smaller file)
- *     - format: Output format - png, jpg, webp, etc. (required)
  *
  * Response:
  *   - success: 1 on success, 0 on error
@@ -39,10 +38,10 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     validateFile(req.file);
 
     // Get parameters
-    const { quality, format } = req.body;
+    const { quality } = req.body;
 
     // Validate required parameters
-    validateParams({ quality, format }, ['quality', 'format']);
+    validateParams({ quality }, ['quality']);
 
     // Validate quality
     validateNumeric({ quality }, ['quality']);
@@ -55,12 +54,11 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     const inputExt = getExtension(req.file.mimetype);
     inputPath = await saveTempFile(req.file.buffer, inputExt);
 
-    // Generate output path
-    const outputExt = getExtension(format);
-    outputPath = inputPath.replace(/\.[^.]+$/, `_optimized.${outputExt}`);
+    // Generate output path (keep original format)
+    outputPath = inputPath.replace(/\.[^.]+$/, `_optimized.${inputExt}`);
 
     // Optimize image
-    await optimizeImage(inputPath, outputPath, qualityNum, format);
+    await optimizeImage(inputPath, outputPath, qualityNum, inputExt);
 
     // Get response mode
     const responseMode = req.query.responseMode || 'base64';
@@ -76,14 +74,14 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     // Send response based on mode
     if (responseMode === 'binary') {
       binaryResponse(res, imageBuffer, {
-        format: outputExt,
+        format: inputExt,
         quality: qualityNum
-      }, outputExt, `optimized.${outputExt}`);
+      }, inputExt, `optimized.${inputExt}`);
     } else {
       const base64Image = imageBuffer.toString('base64');
       res.json(successResponse(base64Image, {
-        mimetype: getMimeType(outputExt),
-        format: outputExt,
+        mimetype: getMimeType(inputExt),
+        format: inputExt,
         quality: qualityNum
       }));
     }

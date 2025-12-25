@@ -22,7 +22,6 @@ const upload = multer({
  *     - image: Image file (required)
  *     - operation: 'rotate' or 'flip' (required)
  *     - value: For rotate: 90, 180, 270 (degrees). For flip: 'horizontal' or 'vertical' (required)
- *     - format: Output format - png, jpg, webp, etc. (required)
  *
  * Response:
  *   - success: 1 on success, 0 on error
@@ -39,10 +38,10 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     validateFile(req.file);
 
     // Get parameters
-    const { operation, value, format } = req.body;
+    const { operation, value } = req.body;
 
     // Validate required parameters
-    validateParams({ operation, value, format }, ['operation', 'value', 'format']);
+    validateParams({ operation, value }, ['operation', 'value']);
 
     const op = operation.toLowerCase();
 
@@ -55,9 +54,8 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     const inputExt = getExtension(req.file.mimetype);
     inputPath = await saveTempFile(req.file.buffer, inputExt);
 
-    // Generate output path
-    const outputExt = getExtension(format);
-    outputPath = inputPath.replace(/\.[^.]+$/, `_${op}.${outputExt}`);
+    // Generate output path (keep original format)
+    outputPath = inputPath.replace(/\.[^.]+$/, `_${op}.${inputExt}`);
 
     // Apply operation
     if (op === 'rotate') {
@@ -65,13 +63,13 @@ router.post('/', upload.single('image'), async (req, res, next) => {
       if (![90, 180, 270, -90, -180, -270].includes(degrees)) {
         throw new Error('Rotation degrees must be 90, 180, or 270 (or negative equivalents)');
       }
-      await rotateImage(inputPath, outputPath, degrees, format);
+      await rotateImage(inputPath, outputPath, degrees, inputExt);
     } else if (op === 'flip') {
       const direction = value.toLowerCase();
       if (!['horizontal', 'vertical'].includes(direction)) {
         throw new Error('Flip direction must be "horizontal" or "vertical"');
       }
-      await flipImage(inputPath, outputPath, direction, format);
+      await flipImage(inputPath, outputPath, direction, inputExt);
     }
 
     // Get response mode
@@ -88,15 +86,15 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     // Send response based on mode
     if (responseMode === 'binary') {
       binaryResponse(res, imageBuffer, {
-        format: outputExt,
+        format: inputExt,
         operation: op,
         value: value
-      }, outputExt, `${op}.${outputExt}`);
+      }, inputExt, `${op}.${inputExt}`);
     } else {
       const base64Image = imageBuffer.toString('base64');
       res.json(successResponse(base64Image, {
-        mimetype: getMimeType(outputExt),
-        format: outputExt,
+        mimetype: getMimeType(inputExt),
+        format: inputExt,
         operation: op,
         value: value
       }));

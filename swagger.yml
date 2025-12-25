@@ -191,7 +191,7 @@ paths:
         - Image Processing
       summary: Resize image
       description: |
-        Resize image with optional aspect ratio preservation:
+        Resize image with optional aspect ratio preservation. Output format will match input format.
         - Both width and height: Exact dimensions (may distort)
         - Only width: Height calculated automatically
         - Only height: Width calculated automatically
@@ -225,14 +225,8 @@ paths:
                   minimum: 1
                   description: Target height in pixels (optional if width provided)
                   example: 600
-                format:
-                  type: string
-                  enum: [png, jpg, jpeg, webp, gif, bmp, tiff]
-                  description: Output image format
-                  example: png
               required:
                 - image
-                - format
       responses:
         '200':
           description: Image resized successfully
@@ -344,7 +338,7 @@ paths:
         - Image Processing
       summary: Rotate or flip image
       description: |
-        Rotate image by degrees or flip horizontally/vertically:
+        Rotate image by degrees or flip horizontally/vertically. Output format will match input format.
         - Rotate: 90, 180, 270 degrees
         - Flip: horizontal or vertical
       parameters:
@@ -376,16 +370,10 @@ paths:
                   type: string
                   description: For rotate (90, 180, 270), for flip (horizontal, vertical)
                   example: "90"
-                format:
-                  type: string
-                  enum: [png, jpg, jpeg, webp, gif, bmp, tiff]
-                  description: Output image format
-                  example: png
               required:
                 - image
                 - operation
                 - value
-                - format
       responses:
         '200':
           description: Image transformed successfully
@@ -426,7 +414,7 @@ paths:
         - Image Processing
       summary: Crop image
       description: |
-        Crop image manually or auto-trim borders:
+        Crop image manually or auto-trim borders. Output format will match input format.
         - Manual mode: Specify exact crop dimensions and position
         - Trim mode: Automatically remove transparent/white borders
       parameters:
@@ -454,11 +442,6 @@ paths:
                   enum: [manual, trim]
                   description: Crop mode
                   example: manual
-                format:
-                  type: string
-                  enum: [png, jpg, jpeg, webp, gif, bmp, tiff]
-                  description: Output image format
-                  example: png
                 width:
                   type: integer
                   minimum: 1
@@ -482,7 +465,6 @@ paths:
               required:
                 - image
                 - mode
-                - format
       responses:
         '200':
           description: Image cropped successfully
@@ -520,7 +502,7 @@ paths:
       tags:
         - Image Processing
       summary: Optimize image quality and file size
-      description: Reduce image file size by adjusting quality and stripping metadata
+      description: Reduce image file size by adjusting quality and stripping metadata. Output format will match input format.
       parameters:
         - name: responseMode
           in: query
@@ -547,15 +529,9 @@ paths:
                   maximum: 100
                   description: Quality percentage (lower = smaller file size)
                   example: 70
-                format:
-                  type: string
-                  enum: [png, jpg, jpeg, webp, gif, bmp, tiff]
-                  description: Output image format
-                  example: jpg
               required:
                 - image
                 - quality
-                - format
       responses:
         '200':
           description: Image optimized successfully

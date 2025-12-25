@@ -21,7 +21,6 @@ const upload = multer({
  *   - Body (multipart/form-data):
  *     - image: Image file (required)
  *     - mode: 'manual' or 'trim' (required)
- *     - format: Output format - png, jpg, webp, etc. (required)
  *
  *     For mode='manual':
  *       - width: Crop width in pixels (required)
@@ -47,10 +46,10 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     validateFile(req.file);
 
     // Get parameters
-    const { mode, format, width, height, x, y } = req.body;
+    const { mode, width, height, x, y } = req.body;
 
     // Validate required parameters
-    validateParams({ mode, format }, ['mode', 'format']);
+    validateParams({ mode }, ['mode']);
 
     const cropMode = mode.toLowerCase();
 
@@ -63,9 +62,8 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     const inputExt = getExtension(req.file.mimetype);
     inputPath = await saveTempFile(req.file.buffer, inputExt);
 
-    // Generate output path
-    const outputExt = getExtension(format);
-    outputPath = inputPath.replace(/\.[^.]+$/, `_cropped.${outputExt}`);
+    // Generate output path (keep original format)
+    outputPath = inputPath.replace(/\.[^.]+$/, `_cropped.${inputExt}`);
 
     if (cropMode === 'manual') {
       // Validate manual crop parameters
@@ -77,10 +75,10 @@ router.post('/', upload.single('image'), async (req, res, next) => {
       const cropX = parseInt(x, 10);
       const cropY = parseInt(y, 10);
 
-      await cropImage(inputPath, outputPath, cropWidth, cropHeight, cropX, cropY, format);
+      await cropImage(inputPath, outputPath, cropWidth, cropHeight, cropX, cropY, inputExt);
     } else {
       // Auto-trim mode
-      await trimImage(inputPath, outputPath, format);
+      await trimImage(inputPath, outputPath, inputExt);
     }
 
     // Get response mode
@@ -96,7 +94,7 @@ router.post('/', upload.single('image'), async (req, res, next) => {
 
     // Prepare metadata
     const metadata = {
-      format: outputExt,
+      format: inputExt,
       mode: cropMode,
       ...(cropMode === 'manual' && {
         width: parseInt(width, 10),
@@ -108,11 +106,11 @@ router.post('/', upload.single('image'), async (req, res, next) => {
 
     // Send response based on mode
     if (responseMode === 'binary') {
-      binaryResponse(res, imageBuffer, metadata, outputExt, `cropped.${outputExt}`);
+      binaryResponse(res, imageBuffer, metadata, inputExt, `cropped.${inputExt}`);
     } else {
       const base64Image = imageBuffer.toString('base64');
       res.json(successResponse(base64Image, {
-        mimetype: getMimeType(outputExt),
+        mimetype: getMimeType(inputExt),
         ...metadata
       }));
     }

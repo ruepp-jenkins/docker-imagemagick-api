@@ -22,7 +22,6 @@ const upload = multer({
  *     - image: Image file (required)
  *     - width: Target width in pixels (optional if height provided)
  *     - height: Target height in pixels (optional if width provided)
- *     - format: Output format - png, jpg, webp, etc. (required)
  *
  * Behavior:
  *   - Both width and height: Image is resized to exact dimensions (may distort)
@@ -45,10 +44,7 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     validateFile(req.file);
 
     // Get parameters
-    const { width, height, format } = req.body;
-
-    // Validate format is provided
-    validateParams({ format }, ['format']);
+    const { width, height } = req.body;
 
     // Validate at least one dimension is provided
     if (!width && !height) {
@@ -62,14 +58,13 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     const inputExt = getExtension(req.file.mimetype);
     inputPath = await saveTempFile(req.file.buffer, inputExt);
 
-    // Generate output path
-    const outputExt = getExtension(format);
-    outputPath = inputPath.replace(/\.[^.]+$/, `_resized.${outputExt}`);
+    // Generate output path (keep original format)
+    outputPath = inputPath.replace(/\.[^.]+$/, `_resized.${inputExt}`);
 
     // Resize image
     const targetWidth = width ? parseInt(width, 10) : null;
     const targetHeight = height ? parseInt(height, 10) : null;
-    await resizeImage(inputPath, outputPath, targetWidth, targetHeight, format);
+    await resizeImage(inputPath, outputPath, targetWidth, targetHeight, inputExt);
 
     // Get response mode
     const responseMode = req.query.responseMode || 'base64';
@@ -85,15 +80,15 @@ router.post('/', upload.single('image'), async (req, res, next) => {
     // Send response based on mode
     if (responseMode === 'binary') {
       binaryResponse(res, imageBuffer, {
-        format: outputExt,
+        format: inputExt,
         width: targetWidth || 'auto',
         height: targetHeight || 'auto'
-      }, outputExt, `resized.${outputExt}`);
+      }, inputExt, `resized.${inputExt}`);
     } else {
       const base64Image = imageBuffer.toString('base64');
       res.json(successResponse(base64Image, {
-        mimetype: getMimeType(outputExt),
-        format: outputExt,
+        mimetype: getMimeType(inputExt),
+        format: inputExt,
         width: targetWidth || 'auto',
         height: targetHeight || 'auto'
       }));
