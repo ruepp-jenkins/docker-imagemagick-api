@@ -27,11 +27,8 @@ app.use(express.json());
 app.use((req, res, next) => {
   const startTime = Date.now();
 
-  // Capture the original end function
-  const originalEnd = res.end;
-
-  // Override res.end to log after response is sent
-  res.end = function(...args) {
+  // Log after response is finished
+  res.on('finish', () => {
     const duration = Date.now() - startTime;
     const ip = req.ip || req.socket?.remoteAddress || 'unknown';
     const method = req.method;
@@ -41,10 +38,7 @@ app.use((req, res, next) => {
     // Log format: [timestamp] IP -> METHOD /path - STATUS (duration ms)
     const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
     console.log(`[${timestamp}] ${ip} -> ${method} ${path} - ${status} (${duration}ms)`);
-
-    // Call the original end function
-    originalEnd.apply(res, args);
-  };
+  });
 
   next();
 });
