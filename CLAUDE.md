@@ -19,10 +19,10 @@
 | Layer | Technology | Version/Notes |
 |-------|-----------|---------------|
 | Runtime | Node.js | LTS version (Alpine Linux) |
-| Framework | Express.js | v4.18.2 |
+| Framework | Express.js | v5.2.1 |
 | Image Processing | ImageMagick | CLI-based (via child_process) |
-| File Upload | Multer | v1.4.5-lts.1 (memory storage) |
-| API Docs | Swagger UI Express | v5.0.0 |
+| File Upload | Multer | v2.4.0 (memory storage) |
+| API Docs | Swagger UI Express | v5.0.1 |
 | Containerization | Docker | Multi-platform (amd64/arm64) |
 | CI/CD | Jenkins | Automated builds with security scanning |
 | Security Scanning | Trivy | SBOM generation + vulnerability checks |
