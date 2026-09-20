@@ -557,6 +557,83 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /rasterize:
+    post:
+      tags:
+        - Image Processing
+      summary: Normalize an image to a square icon
+      description: |
+        Generic conversion only: decodes PNG/JPEG/GIF/WebP/SVG, auto-orients, and resizes/pads
+        onto a transparent square of the given size. No URL fetching, team data, layout or fonts
+        are involved here — callers assemble any composition (tables, captions, multi-icon
+        layouts) themselves and only use this endpoint to normalize one icon at a time.
+        Uploaded SVGs must be self-contained (no external references).
+      parameters:
+        - name: responseMode
+          in: query
+          description: Response format mode
+          required: false
+          schema:
+            type: string
+            enum: [base64, binary]
+            default: base64
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to normalize (PNG, JPEG, GIF, WebP or self-contained SVG)
+                size:
+                  type: integer
+                  minimum: 16
+                  maximum: 512
+                  default: 72
+                  description: Output width/height in pixels (square)
+                format:
+                  type: string
+                  enum: [rgba, png]
+                  default: rgba
+                  description: rgba returns raw width*height*4 pixel bytes; png returns a PNG file
+              required:
+                - image
+      responses:
+        "200":
+          description: Image normalized successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessResponse"
+                  - type: object
+                    properties:
+                      width:
+                        type: integer
+                      height:
+                        type: integer
+                      channels:
+                        type: integer
+                      depth:
+                        type: integer
+              description: Returned when responseMode=base64 (default)
+            image/*:
+              schema:
+                type: string
+                format: binary
+              description: |
+                Returned when responseMode=binary. Raw binary data with metadata in HTTP headers.
+                For format=rgba this is a raw pixel buffer, not a decodable image file.
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 tags:
   - name: System
     description: System and health endpoints

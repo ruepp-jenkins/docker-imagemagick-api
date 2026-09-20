@@ -12,6 +12,7 @@ const convertRoute = require('./routes/convert');
 const rotateRoute = require('./routes/rotate');
 const cropRoute = require('./routes/crop');
 const optimizeRoute = require('./routes/optimize');
+const rasterizeRoute = require('./routes/rasterize');
 
 const app = express();
 app.disable('x-powered-by');
@@ -75,6 +76,7 @@ app.use('/convert', convertRoute);
 app.use('/rotate', rotateRoute);
 app.use('/crop', cropRoute);
 app.use('/optimize', optimizeRoute);
+app.use('/rasterize', rasterizeRoute);
 
 // 404 handler for undefined routes
 app.use((req, res) => {
@@ -109,6 +111,7 @@ app.listen(PORT, () => {
   - POST /rotate        Rotate/flip images
   - POST /crop          Crop images
   - POST /optimize      Optimize images
+  - POST /rasterize     Normalize an image to square RGBA pixels or PNG
 
   Open http://localhost:${PORT}/ in your browser to test the API!
   `);

@@ -79,10 +79,12 @@ src/
 │   ├── convert.js           # POST /convert
 │   ├── rotate.js            # POST /rotate
 │   ├── crop.js              # POST /crop
-│   └── optimize.js          # POST /optimize
+│   ├── optimize.js          # POST /optimize
+│   └── rasterize.js         # POST /rasterize (normalize to square icon)
 ├── utils/
 │   ├── fileHandler.js       # Temp file save/cleanup
 │   ├── imagemagick.js       # CLI command wrapper
+│   ├── rasterize.js         # Rasterize implementation
 │   └── response.js          # Validation + response formatting
 └── server.js                # App entry point
 
@@ -236,6 +238,15 @@ module.exports = router;
   - `quality` (number, 1-100, default: 85)
   - `format` (string, default: original)
 - **ImageMagick Args**: `-quality {quality}`
+
+### POST /rasterize
+- **Purpose**: Normalize any image (PNG/JPEG/GIF/WebP/self-contained SVG) to a fixed-size square icon — generic conversion only, no URL fetching, team/business data, layout or font rendering. Used by callers (e.g. an n8n workflow) that assemble their own composition and just need one icon normalized at a time.
+- **Parameters**:
+  - `image` (file, required)
+  - `size` (number, 16-512, default: 72)
+  - `format` (string: rgba/png, default: rgba)
+- **ImageMagick Args**: `-auto-orient -colorspace sRGB -alpha on -resize {size}x{size} -gravity center -extent {size}x{size} -depth 8 -strip {format}:-`
+- **Note**: `format=rgba` returns a raw `size*size*4` pixel buffer, not a decodable image file
 
 ### GET /health
 - **Purpose**: Container health check endpoint

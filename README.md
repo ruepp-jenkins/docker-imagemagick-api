@@ -11,6 +11,7 @@ A RESTful API for ImageMagick functionality running in a Docker container.
 - **Rotation & Flip** - Rotate and flip images
 - **Image Cropping** - Manual or automatic cropping
 - **Image Optimization** - Quality optimization for smaller file sizes
+- **Rasterize** - Normalize any image (incl. SVG) to a fixed-size square icon (RGBA pixels or PNG)
 - **Optional Authentication** - Token-based authentication
 - **Parallel Processing** - Asynchronous processing of multiple requests
 
@@ -101,7 +102,7 @@ Authorization: Bearer my-secret-token-12345
 
 ### Response Modes
 
-All image processing endpoints (`/resize`, `/convert`, `/rotate`, `/crop`, `/optimize`, `/terminal`) support two response modes via the `responseMode` query parameter:
+All image processing endpoints (`/resize`, `/convert`, `/rotate`, `/crop`, `/optimize`, `/terminal`, `/rasterize`) support two response modes via the `responseMode` query parameter:
 
 #### Base64 Mode (Default)
 
@@ -452,6 +453,42 @@ curl -X POST http://localhost:3000/optimize \
 }
 ```
 
+### POST /rasterize
+
+Normalize an image to a square icon: decode, auto-orient, resize/pad onto a transparent square, output raw RGBA pixels or a PNG. Generic conversion only — no URL fetching, team/business data, layout, or font rendering; composing a table, caption, or multi-icon layout is the caller's job.
+
+**Parameters:**
+
+- `image` (file, required) - Image file (PNG, JPEG, GIF, WebP, or self-contained SVG — no external references)
+- `size` (number, optional) - Output width/height in pixels, square, 16–512 (default: 72)
+- `format` (string, optional) - `rgba` (raw width×height×4 pixel bytes) or `png` (default: `rgba`)
+
+**Example:**
+
+```bash
+curl -X POST http://localhost:3000/rasterize \
+  -F "image=@team-logo.svg" \
+  -F "size=72" \
+  -F "format=png" \
+  > response.json
+```
+
+**Response:**
+
+```json
+{
+  "success": 1,
+  "image": "iVBORw0KGgoAAAANSUhEUgAA...",
+  "format": "png",
+  "width": 72,
+  "height": 72,
+  "channels": 4,
+  "depth": 8
+}
+```
+
+With `format=rgba`, `image` decodes to a raw `width * height * 4` byte buffer (no PNG/file headers) — useful for callers that composite pixels directly instead of re-decoding an image file.
+
 ## Response Format
 
 All endpoints return JSON responses:
@@ -534,10 +571,12 @@ imagemagick-api/
 │   │   ├── convert.js           # Format conversion endpoint
 │   │   ├── rotate.js            # Rotation/Flip endpoint
 │   │   ├── crop.js              # Crop endpoint
-│   │   └── optimize.js          # Optimization endpoint
+│   │   ├── optimize.js          # Optimization endpoint
+│   │   └── rasterize.js         # Rasterize (normalize to square icon) endpoint
 │   ├── utils/
 │   │   ├── fileHandler.js       # File management utilities
 │   │   ├── imagemagick.js       # ImageMagick command wrapper
+│   │   ├── rasterize.js         # Rasterize implementation (format sniffing, magick invocation)
 │   │   └── response.js          # Response formatting
 │   └── server.js                # Express server & routing
 ├── tmpfiles/                    # Temporary files (auto-created)
